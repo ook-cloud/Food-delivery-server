@@ -1,23 +1,12 @@
 import express, { request, response } from "express";
 import mongoose from "mongoose";
-import { User } from "./schemas/user-schema";
-
+import { User } from "./schemas/user-schema.js";
+import connectDB from "./connectDB.js";
 const app = express();
 
 const PORT = 1010;
 
 app.use(express.json());
-
-const connectDB = async () => {
-  try {
-    await mongoose.connect(
-      "mongodb+srv://ooktb57_db_user:90040331@cluster0.m23cvjk.mongodb.net",
-    );
-    console.log("DB is connected");
-  } catch (err) {
-    console.log(err);
-  }
-};
 
 connectDB();
 
