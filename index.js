@@ -24,16 +24,18 @@ app.post("/sign-up", async (request, response) => {
   }
 });
 
-app.post("/food-category", async (request, response) => {});
+// app.post("/food-category", async (request, response) => {});
 app.post("/login", async (request, response) => {
   try {
+    throw new Error("hello");
+
     const { email, password } = request.body;
     console.log(email, password);
     const user = await User.findOne({ email: email });
     if (!user) {
       response.status(404).json({ message: "user not found" });
     }
-    response.status(200).json({ message: "user not found" });
+    response.status(200).json({ message: "user found" });
   } catch (err) {
     response.status(500).json({ message: "internal Server Error", error: err });
   }
