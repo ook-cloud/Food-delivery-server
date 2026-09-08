@@ -5,13 +5,14 @@ import authRouter from "./router/auth/auth.js";
 import foodCategoryRouter from "./router/food-category/food-category-router.js";
 
 import { User } from "./schemas/user-schema.js";
-import { connectDB } from "./connectDB.js";
+import { ConnectDB } from "./connectDB.js";
 
 const app = express();
 const PORT = 1000;
 
 app.use(express.json());
-connectDB();
+
+ConnectDB();
 
 app.use("/auth", authRouter);
 app.use("/food-category", foodCategoryRouter);

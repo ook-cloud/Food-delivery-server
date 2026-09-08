@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const connectDB = async () => {
+export const ConnectDB = async () => {
   try {
     await mongoose.connect(
       "mongodb+srv://ooktb57_db_user:90040331@cluster0.m23cvjk.mongodb.net",
@@ -11,5 +11,4 @@ const connectDB = async () => {
   }
 };
 
-connectDB();
-export default connectDB;
+ConnectDB();
