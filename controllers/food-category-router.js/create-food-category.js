@@ -1,22 +1,13 @@
 import { FoodCategory } from "../../schemas/food-category.js";
 
-export const updateFoodCategory = async (request, response) => {
+export const createFoodCategoryController = async (request, response) => {
   try {
-    const { id, name } = request.body;
+    const { name } = request.body;
 
-    const foodCategory = await FoodCategory.findByIdAndUpdate(
-      id,
-      { categoryName: name },
-      { new: true },
-    );
-
-    if (!foodCategory) {
-      return response.status(404).json({ message: "food category not found" });
-    }
-
+    const foodCategory = await FoodCategory.create({ categoryName: name });
     response
       .status(200)
-      .json({ message: "food category updated", foodCategory });
+      .json({ message: "food category created", foodCategory });
   } catch (err) {
     response.status(500).json({ message: "Internal Server Error", error: err });
   }
