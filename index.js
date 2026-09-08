@@ -6,11 +6,13 @@ import foodCategoryRouter from "./router/food-category/food-category-router.js";
 
 import { User } from "./schemas/user-schema.js";
 import { ConnectDB } from "./connectDB.js";
+import cors from "cors";
 
 const app = express();
-const PORT = 1000;
+const PORT = 1010;
 
 app.use(express.json());
+app.use(cors());
 
 ConnectDB();
 
