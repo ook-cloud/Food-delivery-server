@@ -1,55 +1,56 @@
 import express from "express";
-import { User } from "./schemas/user-schema.js";
+import { User } from "../../schemas/user-schema.js";
 
-const app = express();
-
-const PORT = 1010;
-
-app.use(express.json());
-
-connectDB();
-
-app.get("/api/health", (request, response) => {
-  response.json({ message: `API HEALTHY RUNNING ON ${PORT}` });
-}); //read
-
-app.post("/sign-up", async (request, response) => {
+export const loginController = async (request, response) => {
   try {
     const { email, password } = request.body;
-    const user = await User.create({ email, password });
-    response.status(201).json({ message: "user created", user: user });
-  } catch (err) {
-    response.status(500).json({ message: "internal Server Error", error: err });
-  }
-});
 
-// app.post("/food-category", async (request, response) => {});
-app.post("/login", async (request, response) => {
-  try {
-    throw new Error("hello");
-
-    const { email, password } = request.body;
-    console.log(email, password);
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      response.status(404).json({ message: "user not found" });
+    if (!email || !password) {
+      return response
+        .status(400)
+        .json({ message: "Email and password are required" });
     }
-    response.status(200).json({ message: "user found" });
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return response.status(404).json({ message: "User not found" });
+    }
+
+    if (user.password !== password) {
+      return response.status(401).json({ message: "Invalid credentials" });
+    }
+
+    response.status(200).json({ message: "User found", user });
   } catch (err) {
-    response.status(500).json({ message: "internal Server Error", error: err });
+    console.error("loginController error:", err);
+    response
+      .status(500)
+      .json({ message: "Internal Server Error", error: err.message });
   }
-});
+};
 
-app.delete("/api/health", (request, response) => {
-  response.json({ message: `YOU ARE CALLING DELETE ${PORT}` });
-}); // delete
+export const signUpController = async (request, response) => {
+  try {
+    const { email, password } = request.body;
 
-app.put("/api/health", (request, response) => {
-  response.json({ message: `YOU ARE CALLING UPDATE ${PORT}` });
-}); // update
+    if (!email || !password) {
+      return response
+        .status(400)
+        .json({ message: "Email and password are required" });
+    }
 
-app.listen(PORT, () => {
-  console.log("server is running, on port ${PORT}");
-});
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return response.status(409).json({ message: "User already exists" });
+    }
 
-("mongodb+srv://ooktb57_db_user:90040331@cluster0.m23cvjk.mongodb.net/");
+    const newUser = await User.create({ email, password });
+
+    response.status(201).json({ message: "User created", user: newUser });
+  } catch (err) {
+    console.error("signUpController error:", err);
+    response
+      .status(500)
+      .json({ message: "Internal Server Error", error: err.message });
+  }
+};
