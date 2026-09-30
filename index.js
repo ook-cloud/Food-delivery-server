@@ -1,24 +1,39 @@
+import "dotenv/config";
 import express from "express";
-import mongoose from "mongoose";
-
-import authRouter from "./router/auth/auth.js";
-import foodCategoryRouter from "./router/food-category/food-category-router.js";
-
-import { User } from "./schemas/user-schema.js";
-import { ConnectDB } from "./connectDB.js";
 import cors from "cors";
 
+import authRouter from "./router/auth/auth.js";
+import foodCategoryRouter from "./router/food-category/foodCategory.js";
+import dishesRouter from "./router/dishes/dishes.js";
+import { connectDB } from "./connectDB.js";
+import "dotenv/config";
+
 const app = express();
-const PORT = 1010;
+const PORT = process.env.PORT || 1010;
 
-app.use(express.json());
+// Middleware-үүд
 app.use(cors());
+app.use(express.json());
 
-ConnectDB();
-
+// Routes
 app.use("/auth", authRouter);
-app.use("/food-category", foodCategoryRouter);
+app.use("/foodCategory", foodCategoryRouter);
+app.use("/dishes", dishesRouter);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// Серверийг датабааз холбогдсоны ДАРАА ажиллуулах функц
+const startServer = async () => {
+  try {
+    // 1. Датабаазтай эхэлж холбогдоно
+    await connectDB();
+
+    // 2. Амжилттай холбогдсоны дараа Express порт дээр сонсож эхэлнэ
+    app.listen(PORT, () => {
+      console.log(`🚀 Server is running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error(" Failed to start server:", error.message);
+    process.exit(1);
+  }
+};
+
+startServer();
