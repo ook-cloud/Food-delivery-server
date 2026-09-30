@@ -1,12 +1,12 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-
+import mongoose from "mongoose";
 import authRouter from "./router/auth/auth.js";
 import foodCategoryRouter from "./router/food-category/foodCategory.js";
 import dishesRouter from "./router/dishes/dishes.js";
 import { connectDB } from "./connectDB.js";
-import "dotenv/config";
+import orderRouter from "./router/order/order.js";
 
 const app = express();
 const PORT = process.env.PORT || 1010;
@@ -19,6 +19,7 @@ app.use(express.json());
 app.use("/auth", authRouter);
 app.use("/foodCategory", foodCategoryRouter);
 app.use("/dishes", dishesRouter);
+app.use("/order", orderRouter);
 
 // Серверийг датабааз холбогдсоны ДАРАА ажиллуулах функц
 const startServer = async () => {
