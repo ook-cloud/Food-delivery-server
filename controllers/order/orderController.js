@@ -1,9 +1,9 @@
-import { FoodOrder } from "../../schemas/order-schema.js";
+import { FoodOrder } from "../../schemas/orders-schema.js";
 
 export const foodOrderControllerCreate = async (request, response) => {
   try {
     const { user, totalPrice, address, foodOrderItems, status } = request.body;
-
+    console.log("request.body", request.body);
     const order = await FoodOrder.create({
       user,
       totalPrice,
