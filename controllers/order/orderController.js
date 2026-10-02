@@ -3,16 +3,16 @@ import { FoodOrder } from "../../schemas/orders-schema.js";
 export const foodOrderControllerCreate = async (request, response) => {
   try {
     const { user, totalPrice, address, foodOrderItems, status } = request.body;
-    console.log("request.body", request.body);
+
     const order = await FoodOrder.create({
       user,
       totalPrice,
       address,
       foodOrderItems,
-      status,
+      status: status || "PENDING",
     });
 
-    response.status(201).json({ message: "Order Created", order: order });
+    response.status(201).json({ message: "Order Created", order });
   } catch (err) {
     console.error("Order creation failed:", err);
     response
@@ -24,9 +24,7 @@ export const foodOrderControllerCreate = async (request, response) => {
 export const foodOrderControllerReadAll = async (request, response) => {
   try {
     const orders = await FoodOrder.find()
-
       .populate("user", "email role")
-
       .populate("foodOrderItems.food", "foodName price image");
 
     response.status(200).json({
@@ -49,7 +47,7 @@ export const foodOrderControllerRead = async (request, response) => {
       orders: orders,
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     response
       .status(500)
       .json({ message: "Internal Server Error", error: err.message });
@@ -58,13 +56,18 @@ export const foodOrderControllerRead = async (request, response) => {
 
 export const foodOrderControllerUpdate = async (request, response) => {
   try {
-    const { id, status } = request.body;
+    const { id, orderId, status } = request.body;
+    const targetId = id || orderId; // id эсвэл orderId-ийн алийг нь ч дэмжинэ
+
+    if (!targetId || !status) {
+      return response
+        .status(400)
+        .json({ message: "ID болон status заавал шаардлагатай." });
+    }
 
     const updatedOrder = await FoodOrder.findByIdAndUpdate(
-      id,
-      {
-        status: status,
-      },
+      targetId,
+      { status },
       {
         new: true,
         runValidators: true,
@@ -80,6 +83,7 @@ export const foodOrderControllerUpdate = async (request, response) => {
       order: updatedOrder,
     });
   } catch (err) {
+    console.error("Update status error:", err);
     response
       .status(500)
       .json({ message: "Internal Server Error", error: err.message });
@@ -88,9 +92,10 @@ export const foodOrderControllerUpdate = async (request, response) => {
 
 export const foodOrderControllerDelete = async (request, response) => {
   try {
-    const { id } = request.body;
+    const { id, orderId } = request.body;
+    const targetId = id || orderId;
 
-    const delOrder = await FoodOrder.findByIdAndDelete(id);
+    const delOrder = await FoodOrder.findByIdAndDelete(targetId);
 
     if (!delOrder) {
       return response.status(404).json({ message: "Order not found" });
@@ -101,7 +106,7 @@ export const foodOrderControllerDelete = async (request, response) => {
       order: delOrder,
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     response
       .status(500)
       .json({ message: "Internal Server Error", error: err.message });
